@@ -9,12 +9,12 @@ InfraGhost AI identifies "InfraGhosts" — public infrastructure assets that exi
 ## 🎯 Features
 
 ### Core Functionality
-- **📸 Photo Upload & Analysis**: Upload infrastructure photos with automatic geolocation
-- **🤖 AI-Powered Verification**: Google Gemini Vision analyzes images and user feedback
-- **👻 Ghost Score Calculation**: Automated scoring (0-100) indicating infrastructure usability
-- **🗺️ Interactive Map View**: Color-coded markers showing all reported infrastructure
-- **📊 Authority Dashboard**: Statistical reports with PDF export capability
-- **🎨 Clean UI**: Responsive design with Tailwind CSS, no build process required
+- **Photo Upload & Analysis**: Upload infrastructure photos with automatic geolocation
+- **AI-Powered Verification**: Google Gemini Vision analyzes images and user feedback
+- **Ghost Score Calculation**: Automated scoring (0-100) indicating infrastructure usability
+- **Interactive Map View**: Color-coded markers showing all reported infrastructure
+- **Authority Dashboard**: Statistical reports with PDF export capability
+- **Clean UI**: Responsive design with Tailwind CSS, no build process required
 
 ### Infrastructure Types Supported
 - 🚰 Drinking Water Taps
@@ -29,7 +29,7 @@ InfraGhost AI identifies "InfraGhosts" — public infrastructure assets that exi
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## Quick Start
 
 ### Prerequisites
 - Node.js 14+ installed
@@ -230,7 +230,7 @@ Health check endpoint
 
 ## 💻 Technology Stack
 
-### Frontend (Zero Build Configuration)
+### Frontend
 - **HTML5**: Semantic markup for accessibility
 - **Tailwind CSS**: Utility-first CSS framework (CDN)
 - **Vanilla JavaScript**: ES6+ for interactivity
@@ -419,7 +419,7 @@ Respond ONLY with valid JSON in this exact format:
 
 ---
 
-## 🔒 Security & Best Practices
+## 🔒 Security
 
 ### API Key Management
 ```bash
@@ -438,13 +438,6 @@ reports.json
 *.log
 ```
 
-### Environment Validation
-- Server checks for `GEMINI_API_KEY` on startup - throws error if missing
-- Server checks for `MAPBOX_TOKEN` on startup - throws error if missing
-- Provides links to get free API keys
-- No hardcoded secrets in codebase
-- All configuration via .env file only
-
 ### Error Handling
 - Try-catch blocks on all async operations
 - User-friendly error messages
@@ -461,10 +454,18 @@ npm start
 # Server runs on http://localhost:5000
 ```
 
-## 📄 License
+## 📝 License
 
-This project is open source and available for educational and non-commercial use.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 Author
+
+- [Jyot Shah](https://www.linkedin.com/in/jyotshah1/)
+
+For questions or issues, please open an issue on GitHub or mail to **jyotshah1595@gmail.com**.
 
 ---
 
-**Built with ❤️ using Google Gemini Vision API**
+<p align="center">
+  Built with ❤️ using Google Gemini Vision API
+</p>
