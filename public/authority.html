@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authority Summary - InfraGhost AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-slate-700 shadow-sm border-b border-slate-600">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span style="font-size: 1.5rem">👻</span>
+          <h1 class="text-xl font-bold text-white">InfraGhost AI - Authority Report</h1>
+        </div>
+        <div class="flex gap-4">
+          <a
+            href="/"
+            class="px-4 py-2 text-gray-100 hover:bg-slate-600 rounded-lg transition"
+            >Submit Report</a
+          >
+          <a
+            href="/map.html"
+            class="px-4 py-2 text-gray-100 hover:bg-slate-600 rounded-lg transition"
+            >View Map</a
+          >
+          <a
+            href="/authority.html"
+            class="px-4 py-2 text-gray-100 hover:bg-slate-600 rounded-lg transition"
+            >Authority Summary</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto py-12 px-6">
+      <!-- Header -->
+      <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">
+              📋 Infrastructure Reality Assessment Report
+            </h2>
+            <p class="text-gray-600">
+              Data-driven analysis of public infrastructure usability
+            </p>
+          </div>
+          <button
+            onclick="downloadPDF()"
+            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold"
+          >
+            📥 Download Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Report Content (for PDF export) -->
+      <div id="reportContent" class="space-y-6">
+        <!-- Executive Summary -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Executive Summary</h3>
+
+          <!-- Key Metrics -->
+          <div class="grid md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gradient-to-br from-slate-200 to-slate-300 p-6 rounded-lg border border-slate-400">
+              <div class="text-3xl font-bold text-slate-900" id="metricTotal">0</div>
+              <div class="text-sm text-slate-700 mt-1">Total Assets Reported</div>
+            </div>
+            <div class="bg-gradient-to-br from-red-100 to-red-200 p-6 rounded-lg border border-red-300">
+              <div class="text-3xl font-bold text-red-900" id="metricGhosts">0</div>
+              <div class="text-sm text-red-800 mt-1">InfraGhosts (Unusable)</div>
+            </div>
+            <div class="bg-gradient-to-br from-yellow-100 to-yellow-200 p-6 rounded-lg border border-yellow-300">
+              <div class="text-3xl font-bold text-yellow-900" id="metricPartial">0</div>
+              <div class="text-sm text-yellow-800 mt-1">Partial Functionality</div>
+            </div>
+            <div class="bg-gradient-to-br from-green-100 to-green-200 p-6 rounded-lg border border-green-300">
+              <div class="text-3xl font-bold text-green-900" id="metricFunctional">0</div>
+              <div class="text-sm text-green-800 mt-1">Fully Functional</div>
+            </div>
+          </div>
+
+          <!-- Ghost Percentage -->
+          <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h4 class="font-semibold text-red-900 mb-2">⚠️ Ghost Rate</h4>
+            <div class="text-4xl font-bold text-red-600" id="ghostPercentage">0%</div>
+            <p class="text-sm text-red-700 mt-2">
+              Percentage of reported infrastructure that exists on paper but is
+              not usable in reality.
+            </p>
+          </div>
+        </div>
+
+        <!-- Top Failing Infrastructure Types -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Top 3 Failing Infrastructure Types</h3>
+          <div id="failingTypes" class="space-y-4">
+            <!-- Will be populated by JS -->
+          </div>
+        </div>
+
+        <!-- Most Affected Locations -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Most Affected Locations</h3>
+          <div id="affectedLocations" class="space-y-3">
+            <!-- Will be populated by JS -->
+          </div>
+        </div>
+
+        <!-- Classification Breakdown -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Asset Classification</h3>
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center text-2xl">
+                🔴
+              </div>
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900">InfraGhost (Ghost Score ≥ 60)</div>
+                <p class="text-sm text-gray-600">
+                  Infrastructure exists officially but is not usable. Requires
+                  immediate authority attention.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center text-2xl">
+                🟡
+              </div>
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900">Partial Functionality (Ghost Score 30-60)</div>
+                <p class="text-sm text-gray-600">
+                  Infrastructure works partially or intermittently. Needs
+                  maintenance or repair.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-2xl">
+                🟢
+              </div>
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900">Functional (Ghost Score < 30)</div>
+                <p class="text-sm text-gray-600">
+                  Infrastructure is present and usable for its intended purpose.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Authority Recommendations -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6">Recommended Actions</h3>
+          <div class="space-y-4">
+            <div class="border-l-4 border-red-500 pl-4 py-2">
+              <h4 class="font-semibold text-gray-900">Priority: InfraGhosts</h4>
+              <p class="text-sm text-gray-600">
+                Conduct on-ground verification of high-score ghost assets.
+                Escalate to maintenance teams immediately.
+              </p>
+            </div>
+            <div class="border-l-4 border-yellow-500 pl-4 py-2">
+              <h4 class="font-semibold text-gray-900">Follow-up: Partial Assets</h4>
+              <p class="text-sm text-gray-600">
+                Schedule repairs and maintenance to restore full functionality.
+              </p>
+            </div>
+            <div class="border-l-4 border-green-500 pl-4 py-2">
+              <h4 class="font-semibold text-gray-900">Monitor: Functional Assets</h4>
+              <p class="text-sm text-gray-600">
+                Continue regular maintenance to sustain usability.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Methodology -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-8">
+          <h3 class="text-xl font-bold text-blue-900 mb-4">📊 Methodology</h3>
+          <p class="text-sm text-blue-800 mb-3">
+            This report is generated using:
+          </p>
+          <ul class="text-sm text-blue-800 space-y-2">
+            <li>✓ Google Gemini Vision AI for image analysis</li>
+            <li>✓ Crowdsourced photo-based infrastructure reports</li>
+            <li>✓ Usability score algorithm (0-100)</li>
+            <li>✓ Geographic clustering and location tracking</li>
+            <li>✓ Evidence-based classification system</li>
+          </ul>
+          <p class="text-xs text-blue-700 mt-4">
+            All data is collected from citizen reports and processed through
+            computer vision analysis for accuracy.
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-100 rounded-lg p-6 text-center">
+          <p class="text-gray-700 text-sm">
+            <strong>InfraGhost AI</strong> — Infrastructure Reality Verification
+            System
+          </p>
+          <p class="text-gray-600 text-xs mt-2">
+            Report Generated: <span id="reportDate"></span>
+          </p>
+          <p class="text-gray-600 text-xs mt-1">
+            "These assets exist on paper. Our system checks reality."
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function loadStats() {
+        try {
+          const response = await fetch("/api/stats");
+          const stats = await response.json();
+
+          // Update metrics
+          document.getElementById("metricTotal").textContent = stats.total_reports;
+          document.getElementById("metricGhosts").textContent = stats.infra_ghosts;
+          document.getElementById("metricPartial").textContent = stats.partial;
+          document.getElementById("metricFunctional").textContent = stats.functional;
+
+          const ghostPercent =
+            stats.total_reports > 0
+              ? Math.round((stats.infra_ghosts / stats.total_reports) * 100)
+              : 0;
+          document.getElementById("ghostPercentage").textContent = `${ghostPercent}%`;
+
+          const failingTypesDiv = document.getElementById("failingTypes");
+          if (stats.top_failing_types.length === 0) {
+            failingTypesDiv.innerHTML =
+              '<p class="text-gray-500">No data available yet</p>';
+          } else {
+            failingTypesDiv.innerHTML = stats.top_failing_types
+              .map(
+                (type) => `
+              <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <h4 class="font-semibold text-gray-900 capitalize">${type.type}</h4>
+                    <p class="text-sm text-gray-600">${type.total} total reported | ${type.ghosts} InfraGhosts</p>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-red-600">${type.ghost_percentage}%</div>
+                    <p class="text-xs text-gray-600">failing</p>
+                  </div>
+                </div>
+              </div>
+            `
+              )
+              .join("");
+          }
+
+          const locDiv = document.getElementById("affectedLocations");
+          if (stats.affected_locations.length === 0) {
+            locDiv.innerHTML =
+              '<p class="text-gray-500">No InfraGhosts reported yet</p>';
+          } else {
+            locDiv.innerHTML = stats.affected_locations
+              .map(
+                (loc, idx) => `
+              <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <div class="text-2xl font-bold text-red-600 w-8 text-center">
+                  ${idx + 1}
+                </div>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-900">${loc.location}</div>
+                  <p class="text-sm text-gray-600">${loc.ghost_count} InfraGhosts in this area</p>
+                </div>
+              </div>
+            `
+              )
+              .join("");
+          }
+
+          document.getElementById("reportDate").textContent = new Date().toLocaleDateString(
+            "en-US",
+            { year: "numeric", month: "long", day: "numeric" }
+          );
+        } catch (error) {
+          console.error("Error loading stats:", error);
+        }
+      }
+
+      function downloadPDF() {
+        const element = document.getElementById("reportContent");
+        const opt = {
+          margin: 10,
+          filename: "infraghost-authority-report.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
+        };
+
+        html2pdf()
+          .set(opt)
+          .from(element)
+          .save();
+      }
+
+      loadStats();
+      setInterval(loadStats, 60000);
+    </script>
+  </body>
+</html>
