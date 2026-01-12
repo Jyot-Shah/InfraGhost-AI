@@ -58,6 +58,8 @@ app.post("/api/submit-report", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    console.log(`\n🔍 Analyzing ${infra_type} infrastructure at [${latitude.toFixed(4)}, ${longitude.toFixed(4)}]...`);
+
     const analysis = await analyzeInfrastructure(image_base64, infra_type, comment);
 
     const report = {

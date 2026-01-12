@@ -49,7 +49,7 @@ npm install
 # Create .env file with:
 GEMINI_API_KEY=your_gemini_api_key_here
 MAPBOX_TOKEN=your_mapbox_token_here
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 PORT=5000
 
 # 4. Start the server
