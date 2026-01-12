@@ -83,7 +83,7 @@ InfraGhost AI/
 ├── server.js              # Express backend with API routes
 ├── gemini.js              # Google Gemini Vision integration
 ├── package.json           # Node.js dependencies
-├── .env                   # Environment variables (API keys) - NOT in Git
+├── .env                   # Environment variables (API keys)
 ├── .gitignore             # Git exclusions
 ├── reports.json           # Local JSON database (auto-created)
 ├── README.md              # This file
@@ -423,7 +423,7 @@ Respond ONLY with valid JSON in this exact format:
 
 ### API Key Management
 ```bash
-# .env file (NOT committed to Git)
+# .env file
 GEMINI_API_KEY=your_actual_api_key_here
 MAPBOX_TOKEN=your_mapbox_token_here
 GEMINI_MODEL=gemini-2.0-flash
@@ -465,7 +465,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions or issues, please open an issue on GitHub or mail to **jyotshah1595@gmail.com**.
 
 ---
-
-<p align="center">
-  Built with ❤️ using Google Gemini Vision API
-</p>
