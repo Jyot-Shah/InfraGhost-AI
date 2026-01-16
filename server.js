@@ -87,10 +87,11 @@ app.post("/api/submit-report", async (req, res) => {
 app.get("/api/stats", async (req, res) => {
   try {
     const reports = await getReports();
+    const isGhost = (r) => r.analysis.ghost_score >= 60;
 
     const stats = {
       total_reports: reports.length,
-      infra_ghosts: reports.filter((r) => r.analysis.ghost_score >= 60).length,
+      infra_ghosts: reports.filter(isGhost).length,
       functional: reports.filter((r) => r.analysis.ghost_level === "Functional").length,
       partial: reports.filter((r) => r.analysis.ghost_level === "Partial").length,
       by_type: {},
@@ -103,9 +104,7 @@ app.get("/api/stats", async (req, res) => {
         stats.by_type[r.infra_type] = { total: 0, ghosts: 0, ghost_percentage: 0 };
       }
       stats.by_type[r.infra_type].total++;
-      if (r.analysis.ghost_score >= 60) {
-        stats.by_type[r.infra_type].ghosts++;
-      }
+      if (isGhost(r)) stats.by_type[r.infra_type].ghosts++;
     });
 
     Object.keys(stats.by_type).forEach((type) => {
@@ -120,12 +119,10 @@ app.get("/api/stats", async (req, res) => {
       .map(([type, data]) => ({ type, ...data }));
 
     const locationMap = {};
-    reports
-      .filter((r) => r.analysis.ghost_score >= 60)
-      .forEach((r) => {
-        const key = `${r.latitude.toFixed(4)},${r.longitude.toFixed(4)}`;
-        locationMap[key] = (locationMap[key] || 0) + 1;
-      });
+    reports.filter(isGhost).forEach((r) => {
+      const key = `${r.latitude.toFixed(4)},${r.longitude.toFixed(4)}`;
+      locationMap[key] = (locationMap[key] || 0) + 1;
+    });
 
     stats.affected_locations = Object.entries(locationMap)
       .sort((a, b) => b[1] - a[1])

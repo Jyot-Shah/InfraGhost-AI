@@ -90,47 +90,41 @@ async function handleFormSubmit(e) {
   e.preventDefault();
 
   const infraType = DOM.ById('infraType')?.value;
-  const comment = DOM.ById('comment')?.value;
+  const comment = DOM.ById('comment')?.value || 'No comment';
   const submitBtn = DOM.ById('submitBtn');
 
-  if (!state.imageFile) {
-    Notify.error('Please upload an image');
-    return;
-  }
+  if (!state.imageFile) return Notify.error('Please upload an image');
+  if (!state.userLocation.latitude) return Notify.error('Location access required');
 
-  if (!state.userLocation.latitude) {
-    Notify.error('Location access required');
-    return;
-  }
-
-  Utils.hideElement('successMessage');
-  Utils.hideElement('errorMessage');
+  ['successMessage', 'errorMessage'].forEach(Utils.hideElement);
   Loading.show();
   if (submitBtn) submitBtn.disabled = true;
 
   try {
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const imageBase64 = event.target.result;
-      const response = await API.post('/api/submit-report', {
-        infra_type: infraType,
-        comment: comment || 'No comment',
-        latitude: state.userLocation.latitude,
-        longitude: state.userLocation.longitude,
-        image_base64: imageBase64,
-      });
+    const imageBase64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(state.imageFile);
+    });
 
-      Loading.hide();
+    const response = await API.post('/api/submit-report', {
+      infra_type: infraType,
+      comment,
+      latitude: state.userLocation.latitude,
+      longitude: state.userLocation.longitude,
+      image_base64: imageBase64,
+    });
 
-      if (response.ok) {
-        displaySuccessResult(response.data.report.analysis);
-        resetForm();
-        Utils.scrollIntoView('successMessage', true);
-      } else {
-        Notify.error(response.data.error || 'Failed to submit');
-      }
-    };
-    reader.readAsDataURL(state.imageFile);
+    Loading.hide();
+
+    if (response.ok) {
+      displaySuccessResult(response.data.report.analysis);
+      resetForm();
+      Utils.scrollIntoView('successMessage', true);
+    } else {
+      Notify.error(response.data.error || 'Failed to submit');
+    }
   } catch (error) {
     Loading.hide();
     Notify.error('Network error: ' + error.message);
@@ -140,36 +134,26 @@ async function handleFormSubmit(e) {
 }
 
 function displaySuccessResult(analysis) {
-  DOM.ById('existsValue').innerHTML =
-    analysis.exists ? '<span style="color: var(--success); font-weight: 600;">✓ Yes</span>' :
-      '<span style="color: var(--error); font-weight: 600;">✗ No</span>';
+  const createStatusSpan = (isPositive) => 
+    `<span style="color: var(--${isPositive ? 'success' : 'error'}); font-weight: 600;">${isPositive ? '✓ Yes' : '✗ No'}</span>`;
 
-  DOM.ById('usableValue').innerHTML =
-    analysis.usable ? '<span style="color: var(--success); font-weight: 600;">✓ Yes</span>' :
-      '<span style="color: var(--error); font-weight: 600;">✗ No</span>';
-
+  DOM.ById('existsValue').innerHTML = createStatusSpan(analysis.exists);
+  DOM.ById('usableValue').innerHTML = createStatusSpan(analysis.usable);
   DOM.ById('reasonValue').textContent = analysis.reason;
   DOM.ById('usabilityValue').textContent = analysis.usability_score;
-  DOM.ById('ghostScoreValue').textContent = analysis.ghost_score;
+  
+  const ghostScoreEl = DOM.ById('ghostScoreValue');
+  ghostScoreEl.textContent = analysis.ghost_score;
+  ghostScoreEl.style.color = Utils.getScoreColor(analysis.ghost_score);
 
-  const ghostScoreElement = DOM.ById('ghostScoreValue');
-  ghostScoreElement.style.color = Utils.getScoreColor(analysis.ghost_score);
+  const badgeEl = DOM.ById('ghostLevelValue');
+  badgeEl.textContent = analysis.ghost_level;
+  const badgeColors = { ghost: 'error', partial: 'warning', functional: 'success' };
+  const colorKey = badgeColors[Utils.getStatusClass(analysis.ghost_level)];
+  badgeEl.style.background = `var(--${colorKey})`;
+  badgeEl.style.color = 'white';
 
-  const badgeElement = DOM.ById('ghostLevelValue');
-  badgeElement.textContent = analysis.ghost_level;
-
-  const statusClass = Utils.getStatusClass(analysis.ghost_level);
-  if (statusClass === 'ghost') {
-    badgeElement.style.background = 'var(--error)';
-    badgeElement.style.color = 'white';
-  } else if (statusClass === 'partial') {
-    badgeElement.style.background = 'var(--warning)';
-    badgeElement.style.color = 'white';
-  } else {
-    badgeElement.style.background = 'var(--success)';
-    badgeElement.style.color = 'white';
-  }
-
+  ['heroSection', 'formSection', 'infoSection', 'mapLinkSection'].forEach(Utils.hideElement);
   Utils.showElement('successMessage');
 }
 

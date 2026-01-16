@@ -12,12 +12,194 @@
     <div id="loadingOverlay" class="loading-overlay hidden">
       <div class="loading-content fade-in">
         <div class="spinner"></div>
-        <h3>🔍 Analyzing Infrastructure...</h3>
+        <h3>Analyzing Infrastructure...</h3>
         <p>Our AI is examining your photo to verify the infrastructure reality. This may take a few moments.</p>
         <div class="loading-dots mt-3">
           <span></span>
           <span></span>
-          <script type="module" src="/js/index.js"></script>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+      <div style="max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 2rem;">👻</span>
+          <h1 style="color: var(--beige); font-size: 1.5rem; margin: 0; white-space: nowrap;">InfraGhost AI</h1>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;">
+          <a href="/" class="active">Submit Report</a>
+          <a href="/map.html">Map View</a>
+          <a href="/authority.html">Authority Summary</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div style="max-width: 1200px; margin: 0 auto; padding: 40px 24px;">
+      <!-- Hero Section -->
+      <div id="heroSection" class="hero fade-in">
+        <div class="ghost-icon">👻</div>
+        <h2>Verify Infrastructure Reality</h2>
+        <p>
+          Help us identify InfraGhosts — assets that exist on paper but not in reality. 
+          Upload photos and feedback to build a truthful map of public infrastructure.
+        </p>
+      </div>
+
+      <!-- Success Message -->
+      <div id="successMessage" class="hidden">
+        <div class="card result-card slide-up">
+          <button id="closeSuccess" class="close-btn" title="Close">×</button>
+          
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 3rem;">✅</div>
+            <h3 style="color: var(--success); font-size: 1.8rem; margin-top: 10px;">Report Submitted Successfully!</h3>
+          </div>
+
+          <div class="status-indicator">
+            <span class="status-icon">🏗️</span>
+            <span><strong>Infrastructure Present:</strong> <span id="existsValue"></span></span>
+          </div>
+
+          <div class="status-indicator">
+            <span class="status-icon">✓</span>
+            <span><strong>Usable:</strong> <span id="usableValue"></span></span>
+          </div>
+
+          <div class="analysis-text">
+            <strong style="color: var(--dark-teal); font-size: 1.1rem;">AI Analysis:</strong>
+            <p id="reasonValue" style="margin-top: 10px; color: var(--ink-black); line-height: 1.6;"></p>
+          </div>
+
+          <div class="score-display">
+            <div class="score-box">
+              <div class="score-label">Usability Score</div>
+              <div id="usabilityValue" class="score-value" style="color: var(--air-force-blue);"></div>
+              <div style="font-size: 0.8rem; color: #666;">out of 100</div>
+            </div>
+            <div class="score-box">
+              <div class="score-label">Ghost Score</div>
+              <div id="ghostScoreValue" class="score-value"></div>
+              <div style="font-size: 0.8rem; color: #666;">out of 100</div>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 30px;">
+            <p style="font-size: 0.9rem; color: var(--dark-teal); font-weight: 600; margin-bottom: 10px;">CLASSIFICATION</p>
+            <div id="ghostLevelValue" class="status-badge"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submission Form -->
+      <div id="formSection" class="form-container">
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden">
+          <div class="alert alert-error slide-in">
+            <span style="font-size: 1.5rem;">⚠️</span>
+            <div>
+              <strong>Error</strong>
+              <p id="errorText" style="margin-top: 4px;"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="card fade-in">
+          <form id="reportForm" class="form-group">
+            <!-- Infrastructure Type -->
+            <div>
+              <label for="infraType">Infrastructure Type *</label>
+              <select id="infraType" name="infraType" required>
+                <option value="">Select infrastructure type</option>
+                <option value="water">🚰 Drinking Water</option>
+                <option value="toilet">🚽 Toilet</option>
+                <option value="streetlight">💡 Streetlight</option>
+                <option value="ramp">♿ Ramp</option>
+              </select>
+            </div>
+
+            <!-- Image Upload -->
+            <div>
+              <label>Upload Photo *</label>
+              <div id="imageDropZone" class="drop-zone">
+                <input
+                  type="file"
+                  id="imageInput"
+                  name="image"
+                  accept="image/*"
+                  required
+                  style="display: none;"
+                />
+                <span id="imageLabel" style="color: var(--air-force-blue); font-size: 1.1rem;">
+                  📸 Click to upload or drag and drop<br />
+                  <span style="font-size: 0.9rem; color: var(--ash-grey);">JPG, PNG up to 10MB</span>
+                </span>
+                <img
+                  id="imagePreview"
+                  src=""
+                  alt="Preview"
+                  class="hidden"
+                />
+              </div>
+            </div>
+
+            <!-- Feedback -->
+            <div>
+              <label for="comment">What's the actual condition?</label>
+              <input
+                type="text"
+                id="comment"
+                name="comment"
+                maxlength="100"
+                placeholder="E.g., Tap installed but no water flow"
+              />
+              <div id="charCount" class="char-counter">0/100 characters</div>
+            </div>
+
+            <!-- Location Status -->
+            <div>
+              <label>Location (Auto-detected)</label>
+              <div id="locationStatus" class="location-box">
+                📍 Detecting location...
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px;">
+              <span id="btnText">📤 Submit Infrastructure Report</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info Section -->
+      <div id="infoSection" class="info-container">
+        <div class="info-grid">
+          <div class="info-card fade-in">
+            <h3>What We Check</h3>
+            <p>
+              Our AI analyzes your photo to verify if infrastructure is actually usable, 
+              not just present on paper.
+            </p>
+          </div>
+          <div class="info-card fade-in" style="animation-delay: 0.1s;">
+            <h3>Ghost Score</h3>
+            <p>
+              Score 0-100. High scores mean it's an InfraGhost 
+              (exists but unusable).
+            </p>
+          </div>
+          <div class="info-card fade-in" style="animation-delay: 0.2s;">
+            <h3>See the Map</h3>
+            <p>
+              All reports are mapped. Authorities can use the summary for action.
+            </p>
+          </div>
         </div>
       </div>
       
@@ -35,201 +217,6 @@
       </div>
     </div>
 
-    <script>
-      let userLocation = { latitude: null, longitude: null };
-
-      function getLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              userLocation = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              };
-              document.getElementById("locationStatus").innerHTML =
-                `📍 Location detected: ${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`;
-            },
-            () => {
-              document.getElementById("locationStatus").innerHTML =
-                "⚠️ Please enable location access in your browser";
-              document.getElementById("locationStatus").style.borderColor = "var(--warning)";
-            }
-          );
-        }
-      }
-
-      const imageDropZone = document.getElementById("imageDropZone");
-      const imageInput = document.getElementById("imageInput");
-      const imagePreview = document.getElementById("imagePreview");
-      const imageLabel = document.getElementById("imageLabel");
-
-      imageDropZone.addEventListener("click", () => imageInput.click());
-      
-      imageDropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        imageDropZone.classList.add("drop-zone-active");
-      });
-      
-      imageDropZone.addEventListener("dragleave", () => {
-        imageDropZone.classList.remove("drop-zone-active");
-      });
-      
-      imageDropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        imageDropZone.classList.remove("drop-zone-active");
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith("image/")) {
-          imageInput.files = e.dataTransfer.files;
-          previewImage();
-        }
-      });
-
-      imageInput.addEventListener("change", previewImage);
-
-      function previewImage() {
-        const file = imageInput.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            imagePreview.src = e.target.result;
-            imagePreview.classList.remove("hidden");
-            imageLabel.classList.add("hidden");
-          };
-          reader.readAsDataURL(file);
-        }
-      }
-
-      document.getElementById("comment").addEventListener("input", (e) => {
-        const count = e.target.value.length;
-        document.getElementById("charCount").textContent = `${count}/100 characters`;
-      });
-
-      document.getElementById("reportForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const infraType = document.getElementById("infraType").value;
-        const comment = document.getElementById("comment").value;
-        const imageFile = imageInput.files[0];
-
-        if (!imageFile) {
-          showError("Please upload an image");
-          return;
-        }
-
-        if (!userLocation.latitude) {
-          showError("Location access is required. Please enable location in your browser.");
-          return;
-        }
-
-        document.getElementById("successMessage").classList.add("hidden");
-        document.getElementById("errorMessage").classList.add("hidden");
-        
-        document.getElementById("loadingOverlay").classList.remove("hidden");
-        document.getElementById("submitBtn").disabled = true;
-
-        try {
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            const imageBase64 = event.target.result;
-
-            const response = await fetch("/api/submit-report", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                infra_type: infraType,
-                comment: comment || "No comment provided",
-                latitude: userLocation.latitude,
-                longitude: userLocation.longitude,
-                image_base64: imageBase64,
-              }),
-            });
-
-            const data = await response.json();
-
-            document.getElementById("loadingOverlay").classList.add("hidden");
-
-            if (response.ok) {
-              const analysis = data.report.analysis;
-              
-              document.getElementById("existsValue").innerHTML = 
-                analysis.exists ? '<span style="color: var(--success); font-weight: 600;">✓ Yes</span>' : 
-                '<span style="color: var(--error); font-weight: 600;">✗ No</span>';
-              
-              document.getElementById("usableValue").innerHTML = 
-                analysis.usable ? '<span style="color: var(--success); font-weight: 600;">✓ Yes</span>' : 
-                '<span style="color: var(--error); font-weight: 600;">✗ No</span>';
-              
-              document.getElementById("reasonValue").textContent = analysis.reason;
-              document.getElementById("usabilityValue").textContent = analysis.usability_score;
-              document.getElementById("ghostScoreValue").textContent = analysis.ghost_score;
-              
-              const ghostScoreElement = document.getElementById("ghostScoreValue");
-              ghostScoreElement.style.color = "";
-              if (analysis.ghost_score >= 60) {
-                ghostScoreElement.style.color = "var(--error)";
-              } else if (analysis.ghost_score > 30) {
-                ghostScoreElement.style.color = "var(--warning)";
-              } else {
-                ghostScoreElement.style.color = "var(--success)";
-              }
-              
-              const ghostLevel = analysis.ghost_level;
-              const badgeElement = document.getElementById("ghostLevelValue");
-              badgeElement.textContent = ghostLevel;
-              
-              if (ghostLevel === "InfraGhost") {
-                badgeElement.style.background = "var(--error)";
-                badgeElement.style.color = "white";
-              } else if (ghostLevel === "Partial") {
-                badgeElement.style.background = "var(--warning)";
-                badgeElement.style.color = "white";
-              } else {
-                badgeElement.style.background = "var(--success)";
-                badgeElement.style.color = "white";
-              }
-              
-              document.getElementById("successMessage").classList.remove("hidden");
-              document.getElementById("mapLinkSection").classList.remove("hidden");
-              document.getElementById("heroSection").classList.add("hidden");
-              document.getElementById("formSection").classList.add("hidden");
-              document.getElementById("infoSection").classList.add("hidden");
-              document.getElementById("reportForm").reset();
-              imagePreview.classList.add("hidden");
-              imageLabel.classList.remove("hidden");
-              document.getElementById("charCount").textContent = "0/100 characters";
-              
-              document.getElementById("successMessage").scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-              });
-            } else {
-              showError(data.error || "Failed to submit report");
-            }
-          };
-          reader.readAsDataURL(imageFile);
-        } catch (error) {
-          document.getElementById("loadingOverlay").classList.add("hidden");
-          showError("Network error: " + error.message);
-        } finally {
-          document.getElementById("submitBtn").disabled = false;
-        }
-      });
-
-      document.getElementById("closeSuccess").addEventListener("click", () => {
-        document.getElementById("successMessage").classList.add("hidden");
-        document.getElementById("mapLinkSection").classList.add("hidden");
-        document.getElementById("heroSection").classList.remove("hidden");
-        document.getElementById("formSection").classList.remove("hidden");
-        document.getElementById("infoSection").classList.remove("hidden");
-      });
-
-      function showError(message) {
-        document.getElementById("loadingOverlay").classList.add("hidden");
-        document.getElementById("errorMessage").classList.remove("hidden");
-      }
-    </script>
     <script type="module" src="/js/index.js"></script>
   </body>
 </html>
