@@ -8,13 +8,13 @@
     "dev": "node server.js"
   },
   "keywords": ["infrastructure", "gemini-vision", "mapbox"],
-  "author": "",
+  "author": "Jyot Shah",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
-    "@google/generative-ai": "^0.13.0",
-    "multer": "^1.4.5-lts.1"
+    "@google/generative-ai": "^0.13.0"
   }
 }
+

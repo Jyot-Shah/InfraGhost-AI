@@ -7,7 +7,7 @@ require("dotenv").config();
 const { analyzeInfrastructure } = require("./gemini");
 
 if (!process.env.MAPBOX_TOKEN) {
-  console.error("❌ MAPBOX_TOKEN is required in .env file. Get your free token from https://mapbox.com/");
+  console.error("❌ MAPBOX_TOKEN is required in .env file");
   process.exit(1);
 }
 
@@ -32,7 +32,7 @@ async function getReports() {
   try {
     const data = await fs.readFile(REPORTS_FILE, "utf8");
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -58,7 +58,7 @@ app.post("/api/submit-report", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    console.log(`\n🔍 Analyzing ${infra_type} infrastructure at [${latitude.toFixed(4)}, ${longitude.toFixed(4)}]...`);
+    console.log(`🔍 Analyzing ${infra_type} at [${latitude.toFixed(4)}, ${longitude.toFixed(4)}]`);
 
     const analysis = await analyzeInfrastructure(image_base64, infra_type, comment);
 
@@ -77,12 +77,9 @@ app.post("/api/submit-report", async (req, res) => {
     reports.push(report);
     await saveReports(reports);
 
-    res.json({
-      success: true,
-      report,
-    });
+    res.json({ success: true, report });
   } catch (error) {
-    console.error("Error submitting report:", error);
+    console.error("Report submission error:", error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -103,11 +100,7 @@ app.get("/api/stats", async (req, res) => {
 
     reports.forEach((r) => {
       if (!stats.by_type[r.infra_type]) {
-        stats.by_type[r.infra_type] = {
-          total: 0,
-          ghosts: 0,
-          ghost_percentage: 0,
-        };
+        stats.by_type[r.infra_type] = { total: 0, ghosts: 0, ghost_percentage: 0 };
       }
       stats.by_type[r.infra_type].total++;
       if (r.analysis.ghost_score >= 60) {
@@ -130,17 +123,14 @@ app.get("/api/stats", async (req, res) => {
     reports
       .filter((r) => r.analysis.ghost_score >= 60)
       .forEach((r) => {
-        const locKey = `${r.latitude.toFixed(4)},${r.longitude.toFixed(4)}`;
-        locationMap[locKey] = (locationMap[locKey] || 0) + 1;
+        const key = `${r.latitude.toFixed(4)},${r.longitude.toFixed(4)}`;
+        locationMap[key] = (locationMap[key] || 0) + 1;
       });
 
     stats.affected_locations = Object.entries(locationMap)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
-      .map(([loc, count]) => ({
-        location: loc,
-        ghost_count: count,
-      }));
+      .map(([loc, count]) => ({ location: loc, ghost_count: count }));
 
     res.json(stats);
   } catch (error) {
@@ -153,12 +143,11 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/api/config", (req, res) => {
-  res.json({ 
-    mapboxToken: process.env.MAPBOX_TOKEN || "" 
-  });
+  res.json({ mapboxToken: process.env.MAPBOX_TOKEN || "" });
 });
 
 app.listen(PORT, async () => {
   await initializeReports();
   console.log(`InfraGhost AI running on http://localhost:${PORT}`);
 });
+

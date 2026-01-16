@@ -3,274 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>InfraGhost AI - Infrastructure Reality Verification</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      .ghost-icon {
-        font-size: 2rem;
-      }
-      .fade-in {
-        animation: fadeIn 0.5s ease-in-out;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .success-message {
-        animation: slideIn 0.5s ease-out;
-      }
-      @keyframes slideIn {
-        from {
-          transform: translateX(-100%);
-        }
-        to {
-          transform: translateX(0);
-        }
-      }
-    </style>
+    <title>InfraGhost AI</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/index-styles.css" />
   </head>
-  <body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-slate-700 shadow-sm border-b border-slate-600">
-      <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-          <span class="ghost-icon">👻</span>
-          <h1 class="text-2xl font-bold text-white">InfraGhost AI</h1>
-        </div>
-        <div class="flex gap-4">
-          <a
-            href="/"
-            class="px-4 py-2 text-gray-100 hover:bg-slate-600 rounded-lg transition"
-            >Submit Report</a
-          >
-          <a
-            href="/map.html"
-            class="px-4 py-2 text-gray-100 hover:bg-slate-600 rounded-lg transition"
-            >View Map</a
-          >
-          <a
-            href="/authority.html"
-            class="px-4 py-2 text-gray-100 hover:bg-slate-600 rounded-lg transition"
-            >Authority Summary</a
-          >
+  <body>
+    <!-- Full Screen Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+      <div class="loading-content fade-in">
+        <div class="spinner"></div>
+        <h3>🔍 Analyzing Infrastructure...</h3>
+        <p>Our AI is examining your photo to verify the infrastructure reality. This may take a few moments.</p>
+        <div class="loading-dots mt-3">
+          <span></span>
+          <span></span>
+          <script type="module" src="/js/index.js"></script>
         </div>
       </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="max-w-2xl mx-auto py-12 px-6">
-      <!-- Hero Section -->
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-900 mb-3">
-          Verify Infrastructure Reality
-        </h2>
-        <p class="text-lg text-gray-600">
-          Help us identify InfraGhosts — assets that exist on paper but not in
-          reality. Upload photos and feedback to build a truthful map of public
-          infrastructure.
-        </p>
-      </div>
-
-      <!-- Submission Form -->
-      <div class="bg-white rounded-lg shadow-md p-8 fade-in">
-        <!-- Loading Message -->
-        <div
-          id="loadingMessage"
-          class="hidden mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg"
-        >
-          <div class="flex items-start gap-3">
-            <div class="animate-spin text-2xl">⏳</div>
-            <div>
-              <h3 class="font-semibold text-blue-900">Processing Your Report...</h3>
-              <p class="text-sm text-blue-700">
-                Our AI is analyzing the image. This may take a few moments.
-              </p>
-              <div class="mt-2 flex gap-1">
-                <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
-                <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Success Message -->
-        <div
-          id="successMessage"
-          class="hidden mb-6 p-4 bg-green-50 border border-green-200 rounded-lg success-message relative"
-        >
-          <button
-            id="closeSuccess"
-            class="absolute top-2 right-2 text-green-700 hover:text-green-900 text-xl font-bold"
-            title="Close"
-          >
-            ×
-          </button>
-          <div class="flex items-start gap-3">
-            <span class="text-2xl">✅</span>
-            <div class="flex-1">
-              <h3 class="font-semibold text-green-900 mb-2">Report Submitted!</h3>
-              <div id="analysisResult" class="space-y-2 text-sm">
-                <div class="flex items-center gap-2">
-                  <span class="font-semibold">Infrastructure Present:</span>
-                  <span id="existsValue"></span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="font-semibold">Usable:</span>
-                  <span id="usableValue"></span>
-                </div>
-                <div class="bg-white p-3 rounded border border-green-300">
-                  <span class="font-semibold">Analysis:</span>
-                  <p id="reasonValue" class="text-gray-700 mt-1"></p>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mt-3">
-                  <div class="bg-white p-3 rounded border border-green-300 text-center">
-                    <div class="text-xs text-gray-600">Usability Score</div>
-                    <div id="usabilityValue" class="text-2xl font-bold text-blue-600"></div>
-                  </div>
-                  <div class="bg-white p-3 rounded border border-green-300 text-center">
-                    <div class="text-xs text-gray-600">Ghost Score</div>
-                    <div id="ghostScoreValue" class="text-2xl font-bold"></div>
-                  </div>
-                </div>
-                <div class="bg-white p-3 rounded border border-green-300 text-center">
-                  <span class="font-semibold">Status: </span>
-                  <span id="ghostLevelValue" class="text-lg font-bold"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Error Message -->
-        <div
-          id="errorMessage"
-          class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
-        >
-          <div class="flex items-start gap-3">
-            <span class="text-2xl">❌</span>
-            <div>
-              <h3 class="font-semibold text-red-900">Error</h3>
-              <p id="errorText" class="text-sm text-red-700"></p>
-            </div>
-          </div>
-        </div>
-
-        <form id="reportForm" class="space-y-6">
-          <!-- Infrastructure Type -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-3">
-              Infrastructure Type *
-            </label>
-            <select
-              id="infraType"
-              name="infraType"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select infrastructure type</option>
-              <option value="water">🚰 Drinking Water</option>
-              <option value="toilet">🚽 Toilet</option>
-              <option value="streetlight">💡 Streetlight</option>
-              <option value="ramp">♿ Ramp</option>
-            </select>
-          </div>
-
-          <!-- Image Upload -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-3">
-              Upload Photo *
-            </label>
-            <div
-              id="imageDropZone"
-              class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition"
-            >
-              <input
-                type="file"
-                id="imageInput"
-                name="image"
-                accept="image/*"
-                required
-                class="hidden"
-              />
-              <span id="imageLabel" class="text-gray-600">
-                📸 Click to upload or drag and drop<br />
-                <span class="text-xs text-gray-500">JPG, PNG up to 10MB</span>
-              </span>
-              <img
-                id="imagePreview"
-                src=""
-                alt="Preview"
-                class="hidden mt-4 max-h-48 mx-auto rounded"
-              />
-            </div>
-          </div>
-
-          <!-- Feedback -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-3">
-              What's the actual condition? (max 100 chars)
-            </label>
-            <input
-              type="text"
-              id="comment"
-              name="comment"
-              maxlength="100"
-              placeholder="E.g., Tap installed but no water flow"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <p id="charCount" class="text-xs text-gray-500 mt-1">0/100</p>
-          </div>
-
-          <!-- Location Status -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">
-              Location (Auto-detected)
-            </label>
-            <div id="locationStatus" class="px-4 py-3 bg-gray-100 rounded-lg text-gray-600">
-              📍 Detecting location...
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button
-            type="submit"
-            id="submitBtn"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <span id="btnText">📤 Submit Infra Report</span>
-            <span id="btnLoader" class="hidden">⏳</span>
-          </button>
-        </form>
-      </div>
-
-      <!-- Info Section -->
-      <div class="mt-12 grid md:grid-cols-3 gap-6">
-        <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
-          <h3 class="font-semibold text-blue-900 mb-2">🔍 What We Check</h3>
-          <p class="text-sm text-blue-800">
-            Our AI analyzes your photo to verify if infrastructure is actually
-            usable, not just present on paper.
+      
+      <!-- Map Link (shown after submission) -->
+      <div id="mapLinkSection" class="hidden" style="text-align: center; margin-top: 40px;">
+        <div class="info-card fade-in" style="max-width: 400px; margin: 0 auto;">
+          <h3>🗺️ See the Map</h3>
+          <p>
+            All reports are mapped. View the interactive map to see InfraGhosts in your area.
           </p>
-        </div>
-        <div class="bg-purple-50 p-6 rounded-lg border border-purple-200">
-          <h3 class="font-semibold text-purple-900 mb-2">👻 Ghost Score</h3>
-          <p class="text-sm text-purple-800">
-            Score 0-100. High scores mean it's an InfraGhost (exists but
-            unusable).
-          </p>
-        </div>
-        <div class="bg-green-50 p-6 rounded-lg border border-green-200">
-          <h3 class="font-semibold text-green-900 mb-2">🗺️ See the Map</h3>
-          <p class="text-sm text-green-800">
-            All reports are mapped. Authorities can use the summary for action.
-          </p>
+          <a href="/map.html" class="btn btn-primary" style="display: inline-block; margin-top: 16px; text-decoration: none;">
+            📍 View Infrastructure Map
+          </a>
         </div>
       </div>
     </div>
@@ -287,13 +47,12 @@
                 longitude: position.coords.longitude,
               };
               document.getElementById("locationStatus").innerHTML =
-                `📍 ${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(
-                  4
-                )}`;
+                `📍 Location detected: ${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`;
             },
             () => {
               document.getElementById("locationStatus").innerHTML =
-                "📍 Please enable location access";
+                "⚠️ Please enable location access in your browser";
+              document.getElementById("locationStatus").style.borderColor = "var(--warning)";
             }
           );
         }
@@ -305,16 +64,19 @@
       const imageLabel = document.getElementById("imageLabel");
 
       imageDropZone.addEventListener("click", () => imageInput.click());
+      
       imageDropZone.addEventListener("dragover", (e) => {
         e.preventDefault();
-        imageDropZone.classList.add("border-blue-500", "bg-blue-50");
+        imageDropZone.classList.add("drop-zone-active");
       });
+      
       imageDropZone.addEventListener("dragleave", () => {
-        imageDropZone.classList.remove("border-blue-500", "bg-blue-50");
+        imageDropZone.classList.remove("drop-zone-active");
       });
+      
       imageDropZone.addEventListener("drop", (e) => {
         e.preventDefault();
-        imageDropZone.classList.remove("border-blue-500", "bg-blue-50");
+        imageDropZone.classList.remove("drop-zone-active");
         const file = e.dataTransfer.files[0];
         if (file && file.type.startsWith("image/")) {
           imageInput.files = e.dataTransfer.files;
@@ -338,8 +100,8 @@
       }
 
       document.getElementById("comment").addEventListener("input", (e) => {
-        document.getElementById("charCount").textContent =
-          `${e.target.value.length}/100`;
+        const count = e.target.value.length;
+        document.getElementById("charCount").textContent = `${count}/100 characters`;
       });
 
       document.getElementById("reportForm").addEventListener("submit", async (e) => {
@@ -355,25 +117,20 @@
         }
 
         if (!userLocation.latitude) {
-          showError("Location access is required");
+          showError("Location access is required. Please enable location in your browser.");
           return;
         }
 
-        // Hide previous messages
         document.getElementById("successMessage").classList.add("hidden");
         document.getElementById("errorMessage").classList.add("hidden");
         
-        // Show loading animation
-        document.getElementById("loadingMessage").classList.remove("hidden");
-        
+        document.getElementById("loadingOverlay").classList.remove("hidden");
         document.getElementById("submitBtn").disabled = true;
-        document.getElementById("btnText").classList.add("hidden");
-        document.getElementById("btnLoader").classList.remove("hidden");
 
         try {
           const reader = new FileReader();
           reader.onload = async (event) => {
-            const imageBase64 = event.target.result.split(",")[1];
+            const imageBase64 = event.target.result;
 
             const response = await fetch("/api/submit-report", {
               method: "POST",
@@ -385,56 +142,67 @@
                 comment: comment || "No comment provided",
                 latitude: userLocation.latitude,
                 longitude: userLocation.longitude,
-                image_base64: event.target.result,
+                image_base64: imageBase64,
               }),
             });
 
             const data = await response.json();
 
-            // Hide loading animation
-            document.getElementById("loadingMessage").classList.add("hidden");
+            document.getElementById("loadingOverlay").classList.add("hidden");
 
             if (response.ok) {
               const analysis = data.report.analysis;
               
-              // Clear previous color classes
-              document.getElementById("ghostScoreValue").className = "text-2xl font-bold";
-              
-              // Display full analysis results
               document.getElementById("existsValue").innerHTML = 
-                analysis.exists ? '<span class="text-green-600">✓ Yes</span>' : '<span class="text-red-600">✗ No</span>';
+                analysis.exists ? '<span style="color: var(--success); font-weight: 600;">✓ Yes</span>' : 
+                '<span style="color: var(--error); font-weight: 600;">✗ No</span>';
+              
               document.getElementById("usableValue").innerHTML = 
-                analysis.usable ? '<span class="text-green-600">✓ Yes</span>' : '<span class="text-red-600">✗ No</span>';
+                analysis.usable ? '<span style="color: var(--success); font-weight: 600;">✓ Yes</span>' : 
+                '<span style="color: var(--error); font-weight: 600;">✗ No</span>';
+              
               document.getElementById("reasonValue").textContent = analysis.reason;
-              document.getElementById("usabilityValue").textContent = analysis.usability_score + "/100";
-              document.getElementById("ghostScoreValue").textContent = analysis.ghost_score + "/100";
+              document.getElementById("usabilityValue").textContent = analysis.usability_score;
+              document.getElementById("ghostScoreValue").textContent = analysis.ghost_score;
               
-              // Color code ghost level
-              const ghostLevel = analysis.ghost_level;
-              let levelColor = "text-green-600";
-              if (ghostLevel === "InfraGhost") levelColor = "text-red-600";
-              else if (ghostLevel === "Partial") levelColor = "text-yellow-600";
-              
-              document.getElementById("ghostLevelValue").innerHTML = 
-                `<span class="${levelColor}">${ghostLevel}</span>`;
-              
-              // Color code ghost score
               const ghostScoreElement = document.getElementById("ghostScoreValue");
+              ghostScoreElement.style.color = "";
               if (analysis.ghost_score >= 60) {
-                ghostScoreElement.classList.add("text-red-600");
+                ghostScoreElement.style.color = "var(--error)";
               } else if (analysis.ghost_score > 30) {
-                ghostScoreElement.classList.add("text-yellow-600");
+                ghostScoreElement.style.color = "var(--warning)";
               } else {
-                ghostScoreElement.classList.add("text-green-600");
+                ghostScoreElement.style.color = "var(--success)";
+              }
+              
+              const ghostLevel = analysis.ghost_level;
+              const badgeElement = document.getElementById("ghostLevelValue");
+              badgeElement.textContent = ghostLevel;
+              
+              if (ghostLevel === "InfraGhost") {
+                badgeElement.style.background = "var(--error)";
+                badgeElement.style.color = "white";
+              } else if (ghostLevel === "Partial") {
+                badgeElement.style.background = "var(--warning)";
+                badgeElement.style.color = "white";
+              } else {
+                badgeElement.style.background = "var(--success)";
+                badgeElement.style.color = "white";
               }
               
               document.getElementById("successMessage").classList.remove("hidden");
+              document.getElementById("mapLinkSection").classList.remove("hidden");
+              document.getElementById("heroSection").classList.add("hidden");
+              document.getElementById("formSection").classList.add("hidden");
+              document.getElementById("infoSection").classList.add("hidden");
               document.getElementById("reportForm").reset();
               imagePreview.classList.add("hidden");
               imageLabel.classList.remove("hidden");
+              document.getElementById("charCount").textContent = "0/100 characters";
               
               document.getElementById("successMessage").scrollIntoView({
                 behavior: "smooth",
+                block: "center"
               });
             } else {
               showError(data.error || "Failed to submit report");
@@ -442,31 +210,26 @@
           };
           reader.readAsDataURL(imageFile);
         } catch (error) {
-          document.getElementById("loadingMessage").classList.add("hidden");
+          document.getElementById("loadingOverlay").classList.add("hidden");
           showError("Network error: " + error.message);
         } finally {
           document.getElementById("submitBtn").disabled = false;
-          document.getElementById("btnText").classList.remove("hidden");
-          document.getElementById("btnLoader").classList.add("hidden");
         }
       });
 
-      // Close button for success message
       document.getElementById("closeSuccess").addEventListener("click", () => {
         document.getElementById("successMessage").classList.add("hidden");
+        document.getElementById("mapLinkSection").classList.add("hidden");
+        document.getElementById("heroSection").classList.remove("hidden");
+        document.getElementById("formSection").classList.remove("hidden");
+        document.getElementById("infoSection").classList.remove("hidden");
       });
 
       function showError(message) {
-        document.getElementById("loadingMessage").classList.add("hidden");
+        document.getElementById("loadingOverlay").classList.add("hidden");
         document.getElementById("errorMessage").classList.remove("hidden");
-        document.getElementById("errorText").textContent = message;
-        setTimeout(() => {
-          document.getElementById("errorMessage").classList.add("hidden");
-        }, 5000);
       }
-
-      // Initialize
-      getLocation();
     </script>
+    <script type="module" src="/js/index.js"></script>
   </body>
 </html>
