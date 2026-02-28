@@ -7,6 +7,7 @@ A full-stack infrastructure reality verification system powered by Google Gemini
 ## Highlights
 
 - Photo upload with drag-and-drop, auto-location, and AI-powered analysis
+- Client-side image compression (resize + JPEG quality) before upload
 - Ghost Score classification (0–100) with animated, responsive UI
 - Interactive Mapbox GL JS map with color-coded markers and popups
 - Authority dashboard with executive summary, metrics, and PDF export
@@ -146,7 +147,7 @@ Returns `{ mapboxToken }` — the public Mapbox token for the frontend map.
 
 ### `GET /api/health`
 
-Returns `{ status: "ok" }`.
+Returns `{ status, db }` — server status and MongoDB connection state.
 
 ---
 
@@ -154,11 +155,12 @@ Returns `{ status: "ok" }`.
 
 1. User uploads a photo, selects infrastructure type, and adds a condition comment
 2. Browser auto-detects GPS coordinates via Geolocation API
-3. Backend validates all inputs, then sends the image to Google Gemini Vision
-4. Gemini returns a structured JSON assessment (exists, usable, reason, usability_score)
-5. Ghost Score computed: `100 - usability_score`
-6. Asset classified: **InfraGhost** (≥ 60), **Partial** (30–60), **Functional** (< 30)
-7. Report saved to MongoDB Atlas and immediately visible on the map and dashboard
+3. Image is compressed client-side (max 1280px, 70% JPEG quality) to stay within AI token limits
+4. Backend validates all inputs, then sends the image to Google Gemini Vision
+5. Gemini returns a structured JSON assessment (exists, usable, reason, usability_score)
+6. Ghost Score computed: `100 - usability_score`
+7. Asset classified: **InfraGhost** (≥ 60), **Partial** (30–60), **Functional** (< 30)
+8. Report saved to MongoDB Atlas (image is not persisted) and immediately visible on the map and dashboard
 
 ---
 
@@ -166,6 +168,7 @@ Returns `{ status: "ok" }`.
 
 ### Index — Submission Form
 - Drag-and-drop or click-to-upload image with preview
+- Client-side image compression to reduce upload size and avoid token limits
 - Auto-detected GPS location display
 - Infrastructure type dropdown + condition comment (with character counter)
 - Full-screen loading overlay during AI analysis
