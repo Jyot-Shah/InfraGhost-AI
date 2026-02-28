@@ -7,19 +7,23 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": ["infrastructure", "gemini-vision", "mapbox"],
+  "keywords": [
+    "infrastructure",
+    "gemini-vision",
+    "mapbox"
+  ],
   "author": "Jyot Shah",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
+    "@google/generative-ai": "^0.13.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
-    "helmet": "^7.1.0",
+    "express": "^4.18.2",
     "express-rate-limit": "^7.1.0",
-    "@google/generative-ai": "^0.13.0"
+    "helmet": "^7.1.0",
+    "mongoose": "^9.2.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.0"
   }
 }
-

@@ -11,3 +11,5 @@ services:
         sync: false
       - key: MAPBOX_TOKEN
         sync: false
+      - key: MONGO_URI
+        sync: false

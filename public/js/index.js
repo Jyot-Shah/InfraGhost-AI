@@ -1,5 +1,34 @@
 import { Utils, DOM, API, Events, Notify, Loading } from './utils.js';
 
+/**
+ * Compress and resize an image file using canvas.
+ * @param {File} file - Image file to compress
+ * @param {number} maxDim - Max width or height in pixels (default 1280)
+ * @param {number} quality - JPEG quality 0–1 (default 0.7)
+ * @returns {Promise<string>} base64 data URL
+ */
+function compressImage(file, maxDim = 1280, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 const state = { userLocation: { latitude: null, longitude: null }, imageFile: null };
 
 function initializeLocation() {
@@ -101,12 +130,7 @@ async function handleFormSubmit(e) {
   if (submitBtn) submitBtn.disabled = true;
 
   try {
-    const imageBase64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(state.imageFile);
-    });
+    const imageBase64 = await compressImage(state.imageFile, 1280, 0.7);
 
     const response = await API.post('/api/submit-report', {
       infra_type: infraType,

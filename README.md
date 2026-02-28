@@ -27,7 +27,7 @@ A full-stack infrastructure reality verification system powered by Google Gemini
 | Frontend | HTML5, ES6 modules, custom CSS |
 | Maps | Mapbox GL JS v2.15 |
 | PDF | html2pdf.js (CDN) |
-| Storage | File-based `reports.json` |
+| Database | MongoDB Atlas (Mongoose ODM) |
 | Deployment | Render.com (`render.yaml`) |
 | Dev Tools | `nodemon` |
 
@@ -42,8 +42,10 @@ InfraGhost AI/
 ├── package.json           Dependencies + scripts
 ├── render.yaml            Render.com deployment config
 ├── .env                   API keys (not committed)
-├── .gitignore             Excludes .env, reports.json, node_modules, etc.
-├── reports.json           Local JSON store (auto-created)
+├── db.js                  MongoDB Atlas connection + graceful shutdown
+├── models/
+│   └── Report.js          Mongoose schema + indexes for reports
+├── .gitignore             Excludes .env, node_modules, etc.
 └── public/
     ├── index.html         Submission form with drag-and-drop upload
     ├── map.html           Interactive map with sidebar
@@ -67,6 +69,7 @@ InfraGhost AI/
 ### Prerequisites
 
 - Node.js 14+
+- MongoDB Atlas cluster — https://cloud.mongodb.com/
 - Google Gemini API key — https://ai.google.dev/
 - Mapbox public token — https://account.mapbox.com/
 
@@ -76,6 +79,7 @@ InfraGhost AI/
 npm install
 
 # Create .env file
+MONGO_URI=your_mongodb_atlas_url
 GEMINI_API_KEY=your_gemini_api_key
 MAPBOX_TOKEN=your_mapbox_public_token
 GEMINI_MODEL=gemini-2.5-flash
@@ -94,6 +98,7 @@ npm run dev
 
 | Variable | Required | Description |
 |---|---|---|
+| `MONGO_URI` | Yes | MongoDB Atlas connection string |
 | `GEMINI_API_KEY` | Yes | Google Gemini API key |
 | `MAPBOX_TOKEN` | Yes | Mapbox public access token |
 | `GEMINI_MODEL` | No | Gemini model name (default: `gemini-2.5-flash`) |
@@ -111,7 +116,7 @@ npm run dev
 - **XSS prevention** — all user-generated content escaped via `escapeHTML()` before DOM injection in map popups, sidebar, and dashboard
 - **Error sanitization** — internal error messages and stack traces are never leaked to clients
 - **CORS** — restricted to specified origin in production; limited to GET/POST methods
-- **File lock** — prevents concurrent write corruption on `reports.json`
+- **MongoDB Atlas** — cloud-hosted database with encrypted connections, no local file corruption risks
 - **API keys** — stored in `.env`, excluded from git via `.gitignore` and `.renderignore`
 - **No hardcoded secrets** — `GEMINI_API_KEY` loaded from `process.env`; `/api/config` returns only the public Mapbox token
 
@@ -129,7 +134,7 @@ Submit an infrastructure report for AI analysis.
 
 ### `GET /api/reports`
 
-Returns all saved reports from `reports.json`.
+Returns all saved reports from MongoDB (sorted newest first).
 
 ### `GET /api/stats`
 
@@ -153,7 +158,7 @@ Returns `{ status: "ok" }`.
 4. Gemini returns a structured JSON assessment (exists, usable, reason, usability_score)
 5. Ghost Score computed: `100 - usability_score`
 6. Asset classified: **InfraGhost** (≥ 60), **Partial** (30–60), **Functional** (< 30)
-7. Report saved to `reports.json` and immediately visible on the map and dashboard
+7. Report saved to MongoDB Atlas and immediately visible on the map and dashboard
 
 ---
 
