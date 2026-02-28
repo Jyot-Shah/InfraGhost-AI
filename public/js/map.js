@@ -79,18 +79,19 @@ function renderMap() {
 }
 
 function createPopupHTML(report) {
+  const esc = Utils.escapeHTML;
   const scoreClass = report.analysis.ghost_score >= 60 ? 'high' :
                     report.analysis.ghost_score > 30 ? 'medium' : 'low';
   return `
-    <div class="popup-title">${getInfraTypeEmoji(report.infra_type)} ${report.infra_type.toUpperCase()}</div>
-    <div class="popup-item"><strong>Status:</strong> ${report.analysis.ghost_level}</div>
-    <div class="popup-item"><strong>Comment:</strong> ${report.comment}</div>
-    <div class="popup-item"><strong>Analysis:</strong> ${report.analysis.reason}</div>
-    <div class="ghost-score ${scoreClass}">Ghost Score: ${report.analysis.ghost_score}</div>
+    <div class="popup-title">${getInfraTypeEmoji(report.infra_type)} ${esc(report.infra_type.toUpperCase())}</div>
+    <div class="popup-item"><strong>Status:</strong> ${esc(report.analysis.ghost_level)}</div>
+    <div class="popup-item"><strong>Comment:</strong> ${esc(report.comment)}</div>
+    <div class="popup-item"><strong>Analysis:</strong> ${esc(report.analysis.reason)}</div>
+    <div class="ghost-score ${scoreClass}">Ghost Score: ${Number(report.analysis.ghost_score)}</div>
     <div class="popup-item" style="font-size: 12px; color: #666; margin-top: 8px;">
-      📍 ${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}</div>
+      📍 ${Number(report.latitude).toFixed(4)}, ${Number(report.longitude).toFixed(4)}</div>
     <div class="popup-item" style="font-size: 12px; color: #999;">
-      ${new Date(report.timestamp).toLocaleDateString()}</div>
+      ${esc(new Date(report.timestamp).toLocaleDateString())}</div>
   `;
 }
 
@@ -119,16 +120,17 @@ function renderSidebar() {
   }
 
   const sorted = [...state.reports].sort((a, b) => b.analysis.ghost_score - a.analysis.ghost_score);
+  const esc = Utils.escapeHTML;
 
   listDiv.innerHTML = sorted
     .map((r) => `
-      <div class="report-item" onclick="window.mapFlyTo(${r.longitude}, ${r.latitude})">
+      <div class="report-item" onclick="window.mapFlyTo(${Number(r.longitude)}, ${Number(r.latitude)})">
         <div class="report-item-header">
-          <div class="report-item-name">${getInfraTypeEmoji(r.infra_type)} ${r.infra_type}</div>
-          <div class="report-item-score ${Utils.getStatusClass(r.analysis.ghost_level)}">${r.analysis.ghost_score}</div>
+          <div class="report-item-name">${getInfraTypeEmoji(r.infra_type)} ${esc(r.infra_type)}</div>
+          <div class="report-item-score ${Utils.getStatusClass(r.analysis.ghost_level)}">${Number(r.analysis.ghost_score)}</div>
         </div>
-        <div class="report-item-comment">"${r.comment}"</div>
-        <div class="report-item-status">${r.analysis.ghost_level}</div>
+        <div class="report-item-comment">"${esc(r.comment)}"</div>
+        <div class="report-item-status">${esc(r.analysis.ghost_level)}</div>
       </div>
     `)
     .join('');

@@ -153,8 +153,9 @@ function displaySuccessResult(analysis) {
   badgeEl.style.background = `var(--${colorKey})`;
   badgeEl.style.color = 'white';
 
-  ['heroSection', 'formSection', 'infoSection', 'mapLinkSection'].forEach(Utils.hideElement);
+  ['heroSection', 'formSection', 'infoSection'].forEach(Utils.hideElement);
   Utils.showElement('successMessage');
+  Utils.showElement('mapLinkSection');
 }
 
 function resetForm() {

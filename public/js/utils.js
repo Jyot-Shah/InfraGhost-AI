@@ -19,6 +19,13 @@ export const Utils = {
     if (ghostLevel === 'InfraGhost') return 'ghost';
     if (ghostLevel === 'Partial') return 'partial';
     return 'functional';
+  },
+  // HTML escape to prevent XSS
+  escapeHTML: (str) => {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 };
 

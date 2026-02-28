@@ -1,3 +1,11 @@
+// HTML escape to prevent XSS
+function escapeHTML(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // DOM helpers
 const $ = (id) => document.getElementById(id);
 
@@ -55,11 +63,11 @@ function renderFailingTypes() {
   container.innerHTML = types.map(t => `
     <div class="failing-type-item">
       <div class="failing-type-name">
-        <h4>${capitalize(t.type)}</h4>
-        <p>${t.total} reported • ${t.ghosts} ghosts</p>
+        <h4>${escapeHTML(capitalize(t.type))}</h4>
+        <p>${Number(t.total)} reported • ${Number(t.ghosts)} ghosts</p>
       </div>
       <div class="failing-type-stats">
-        <span class="failing-type-percent">${t.ghost_percentage}%</span>
+        <span class="failing-type-percent">${Number(t.ghost_percentage)}%</span>
         <span class="failing-type-label">failing</span>
       </div>
     </div>
@@ -80,8 +88,8 @@ function renderLocations() {
     <div class="location-item">
       <span class="location-rank">${i + 1}</span>
       <div class="location-info">
-        <h4>${loc.location}</h4>
-        <p>${loc.ghost_count} InfraGhosts</p>
+        <h4>${escapeHTML(loc.location)}</h4>
+        <p>${Number(loc.ghost_count)} InfraGhosts</p>
       </div>
     </div>
   `).join('');
