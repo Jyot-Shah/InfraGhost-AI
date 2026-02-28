@@ -1,157 +1,204 @@
 # InfraGhost AI 👻
 
-A lightweight, full-stack system that verifies the real-world usability of public infrastructure using Google Gemini Vision. Users submit photos and feedback; the backend analyzes them and computes a Ghost Score to classify assets as InfraGhost, Partial, or Functional. The app includes a submission form, an interactive map, and an authority dashboard with PDF export.
+A full-stack infrastructure reality verification system powered by Google Gemini Vision AI. Citizens submit geotagged photos of public infrastructure; the AI analyzes usability and computes a Ghost Score to classify assets as **InfraGhost**, **Partial**, or **Functional**. Includes a submission form, interactive Mapbox map, and an authority dashboard with PDF export.
 
 ---
 
 ## Highlights
-- Photo upload with auto-location and AI-powered analysis
-- Ghost Score classification with clean, responsive UI
-- Interactive Mapbox visualization of reports
-- Authority summary with PDF export (simple mode enabled)
-- No build step; ES modules + custom CSS
-- Safe API key handling via `.env`
+
+- Photo upload with drag-and-drop, auto-location, and AI-powered analysis
+- Ghost Score classification (0–100) with animated, responsive UI
+- Interactive Mapbox GL JS map with color-coded markers and popups
+- Authority dashboard with executive summary, metrics, and PDF export
+- No build step — vanilla ES6 modules + custom CSS
+- Hardened security: Helmet CSP, rate limiting, XSS prevention, input validation
 
 ---
 
 ## Tech Stack
-- Backend: Node.js, Express, `dotenv`
-- AI: `@google/generative-ai` (Google Gemini)
-- Frontend: HTML, ES6 modules, custom CSS
-- Maps: Mapbox GL JS
-- PDF: html2pdf.js
-- Storage: Local `reports.json` (MVP)
+
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js |
+| Backend | Express.js |
+| Security | `helmet` (HTTP headers + CSP), `express-rate-limit`, `cors` |
+| AI | `@google/generative-ai` (Google Gemini Vision) |
+| Config | `dotenv` |
+| Frontend | HTML5, ES6 modules, custom CSS |
+| Maps | Mapbox GL JS v2.15 |
+| PDF | html2pdf.js (CDN) |
+| Storage | File-based `reports.json` |
+| Deployment | Render.com (`render.yaml`) |
+| Dev Tools | `nodemon` |
 
 ---
 
 ## Project Structure
 
+```
 InfraGhost AI/
-- server.js (Express backend + API routes)
-- gemini.js (Gemini Vision integration)
-- package.json (dependencies + scripts)
-- .env (API keys; not committed)
-- .gitignore (excludes `.env`, `reports.json`, etc.)
-- reports.json (local store; auto-created)
-- public/
-  - index.html (submission form; module script)
-  - map.html (interactive map)
-  - authority.html (authority summary + PDF)
-  - css/
-    - main.css (global styles)
-    - index-styles.css
-    - map-styles.css
-    - authority-styles.css
-  - js/
-    - index.js (submission flow)
-    - map.js (map rendering)
-    - authority.js (dashboard + PDF)
+├── server.js              Express backend + API routes + security middleware
+├── gemini.js              Gemini Vision integration + token estimation
+├── package.json           Dependencies + scripts
+├── render.yaml            Render.com deployment config
+├── .env                   API keys (not committed)
+├── .gitignore             Excludes .env, reports.json, node_modules, etc.
+├── reports.json           Local JSON store (auto-created)
+└── public/
+    ├── index.html         Submission form with drag-and-drop upload
+    ├── map.html           Interactive map with sidebar
+    ├── authority.html     Authority dashboard + PDF export
+    ├── css/
+    │   ├── main.css       Global styles, animations, utilities
+    │   ├── index-styles.css
+    │   ├── map-styles.css
+    │   └── authority-styles.css  (includes PDF export overrides)
+    └── js/
+        ├── utils.js       Shared utilities: DOM, API, Notify, escapeHTML
+        ├── index.js       Submission page logic
+        ├── map.js         Map rendering + markers + sidebar
+        └── authority.js   Dashboard + stats + PDF download
+```
 
 ---
 
 ## Setup
 
 ### Prerequisites
+
 - Node.js 14+
-- Google Gemini API key (https://ai.google.dev/)
-- Mapbox public token (https://account.mapbox.com/)
+- Google Gemini API key — https://ai.google.dev/
+- Mapbox public token — https://account.mapbox.com/
 
 ### Install & Run
 
 ```bash
 npm install
 
-# Create .env with these keys
+# Create .env file
 GEMINI_API_KEY=your_gemini_api_key
 MAPBOX_TOKEN=your_mapbox_public_token
 GEMINI_MODEL=gemini-2.5-flash
 PORT=5000
 
+# Production
 npm start
+
+# Development (auto-restart with nodemon)
+npm run dev
+
 # Visit http://localhost:5000
 ```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | Yes | Google Gemini API key |
+| `MAPBOX_TOKEN` | Yes | Mapbox public access token |
+| `GEMINI_MODEL` | No | Gemini model name (default: `gemini-2.5-flash`) |
+| `PORT` | No | Server port (default: `5000`) |
+| `NODE_ENV` | No | Set to `production` for stricter CORS |
+| `ALLOWED_ORIGIN` | No | Allowed CORS origin in production |
 
 ---
 
 ## Security
-- Never hardcode `GEMINI_API_KEY` or secrets in source code
-- `.gitignore` excludes `.env` and `reports.json`
-- Backend validates missing keys early and exits
-- `/api/config` returns only the public Mapbox token
+
+- **Helmet** — sets security headers including a full Content-Security-Policy (CSP) allowing only trusted sources (Mapbox, Google Fonts, cdnjs)
+- **Rate limiting** — 100 requests/15 min on all API routes; 20/15 min on `/api/submit-report` to protect Gemini API credits
+- **Input validation** — `infra_type` checked against an allowlist (`water`, `toilet`, `streetlight`, `ramp`); coordinates range-validated; comments HTML-stripped and length-capped (200 chars)
+- **XSS prevention** — all user-generated content escaped via `escapeHTML()` before DOM injection in map popups, sidebar, and dashboard
+- **Error sanitization** — internal error messages and stack traces are never leaked to clients
+- **CORS** — restricted to specified origin in production; limited to GET/POST methods
+- **File lock** — prevents concurrent write corruption on `reports.json`
+- **API keys** — stored in `.env`, excluded from git via `.gitignore` and `.renderignore`
+- **No hardcoded secrets** — `GEMINI_API_KEY` loaded from `process.env`; `/api/config` returns only the public Mapbox token
 
 ---
 
 ## API
 
-- POST /api/submit-report
-  - Body: `{ infra_type, comment, latitude, longitude, image_base64 }`
-  - Returns: `{ success, report }` with analysis and classification
+### `POST /api/submit-report` *(rate-limited: 20/15 min)*
 
-- GET /api/reports
-  - Returns: `[]` of reports (MVP JSON store)
+Submit an infrastructure report for AI analysis.
 
-- GET /api/stats
-  - Returns: aggregated counts, top failing types, affected locations
+- **Body:** `{ infra_type, comment, latitude, longitude, image_base64 }`
+- **Validation:** type must be in `[water, toilet, streetlight, ramp]`; coordinates must be valid; comment sanitized
+- **Returns:** `{ success, report }` with analysis and classification
 
-- GET /api/config
-  - Returns: `{ mapboxToken }` (public token expected)
+### `GET /api/reports`
 
-- GET /api/health
-  - Returns: `{ status: "ok" }`
+Returns all saved reports from `reports.json`.
+
+### `GET /api/stats`
+
+Returns aggregated statistics: totals, ghost counts, top failing infrastructure types, most affected locations.
+
+### `GET /api/config`
+
+Returns `{ mapboxToken }` — the public Mapbox token for the frontend map.
+
+### `GET /api/health`
+
+Returns `{ status: "ok" }`.
 
 ---
 
 ## Flow Overview
-1) User uploads a photo and feedback on the index page
-2) Backend calls Google Gemini Vision with the image and context
-3) Response parsed as JSON, Ghost Score computed: `100 - usability_score`
-4) Asset classified: InfraGhost (≥60), Partial (30–60), Functional (<30)
-5) Report saved to `reports.json` and visible on the map and dashboard
+
+1. User uploads a photo, selects infrastructure type, and adds a condition comment
+2. Browser auto-detects GPS coordinates via Geolocation API
+3. Backend validates all inputs, then sends the image to Google Gemini Vision
+4. Gemini returns a structured JSON assessment (exists, usable, reason, usability_score)
+5. Ghost Score computed: `100 - usability_score`
+6. Asset classified: **InfraGhost** (≥ 60), **Partial** (30–60), **Functional** (< 30)
+7. Report saved to `reports.json` and immediately visible on the map and dashboard
 
 ---
 
 ## Frontend Pages
-- Index (Submission)
-  - Upload image, auto-location, type selection, short comment
-  - Submits to `/api/submit-report` and shows analysis
 
-- Map (Visualization)
-  - Loads reports, displays markers by classification (red/yellow/green)
-  - Popups show summary and coordinates
+### Index — Submission Form
+- Drag-and-drop or click-to-upload image with preview
+- Auto-detected GPS location display
+- Infrastructure type dropdown + condition comment (with character counter)
+- Full-screen loading overlay during AI analysis
+- Animated success card showing exists/usable status, AI analysis, usability score, ghost score, and classification badge
+- "View Infrastructure Map" link after submission
 
-- Authority (Summary + PDF)
-  - Fetches stats, shows metrics, failing types, locations
-  - Download PDF (current mode: simplified, minimal options)
+### Map — Interactive Visualization
+- Mapbox GL JS map centered on report area
+- Color-coded markers: 🔴 InfraGhost, 🟡 Partial, 🟢 Functional
+- Clickable popups with report details (XSS-safe)
+- Sidebar with stats summary and scrollable report list
+- Click any report to fly to its location
+- Auto-refreshes every 30 seconds
+
+### Authority — Dashboard + PDF
+- Executive summary with metric cards (total, ghosts, partial, functional)
+- Ghost Rate percentage with visual emphasis
+- Top failing infrastructure types ranked by ghost percentage
+- Most affected geographic locations
+- Classification criteria and recommended actions
+- Methodology section
+- One-click PDF download via html2pdf.js with dedicated print styles
 
 ---
 
 ## PDF Export
-- Default mode can be high-contrast with careful typography and page breaks
-- Current mode is simplified: minimal html2pdf options for testing
-- Switch options in `public/js/authority.js` if needed
 
----
-
-## Troubleshooting
-- Missing Mapbox token: `/api/config` returns empty; set `MAPBOX_TOKEN` in `.env`
-- Missing Gemini key: server exits with an error; set `GEMINI_API_KEY`
-- Large images: Base64 upload is supported; keep sizes reasonable for MVP
-- CORS: Express has `cors` enabled; backend and frontend share origin
-
----
-
-## Pre-Push Checklist
-- `.env` exists locally and is not committed
-- `GEMINI_API_KEY` and `MAPBOX_TOKEN` configured
-- `npm install` completes without errors
-- `npm start` runs the server
-- Test the app: submit, map view, PDF download
-- No errors in browser console or server logs
+- Uses `html2pdf.js` with A4 portrait format
+- Dedicated `.pdf-export` CSS class applies high-contrast, print-optimized styles
+- Page break control on sections to prevent splitting
+- Clean typography and forced colors for consistent PDF output
 
 ---
 
 ## License
-MIT License. See LICENSE.
+
+MIT License. See [LICENSE](LICENSE).
 
 ## Author
-Jyot Shah — open issues here or email: jyotshah1595@gmail.com
+
+[Jyot Shah](https://www.linkedin.com/in/jyotshah1/) — open issues here or email: jyotshah1595@gmail.com
